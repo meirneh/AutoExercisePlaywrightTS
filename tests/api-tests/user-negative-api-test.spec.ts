@@ -16,8 +16,7 @@ test.describe('Products API', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
-
+      
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
@@ -64,7 +63,6 @@ test.describe('Products API', () => {
 
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(200);
         expect(json.brands.length, 'brands length').toBe(34);
         expect(json, 'JSON parseable').toBeTruthy();
@@ -91,7 +89,6 @@ test.describe('Products API', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(405);
         expect(json.message).toEqual("This request method is not supported.");
 
@@ -107,7 +104,6 @@ test.describe('Products API', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         console.log(json.products.length, 'products length');
         expect(json.products.length, 'products length').toBe(14);
         for (const p of json.products) {
@@ -126,7 +122,7 @@ test.describe('Products API', () => {
                 })
             );
 
-            // Coincidencia con el término de búsqueda en alguno de los campos relevantes
+            // Match the search term in one of the relevant fields
             const thereIsACoincidence =
                 String(p.name).toLowerCase().includes(keyword.toLowerCase()) ||
                 String(p.brand).toLowerCase().includes(keyword.toLowerCase()) ||
@@ -136,6 +132,20 @@ test.describe('Products API', () => {
             expect(thereIsACoincidence).toBeTruthy();
         }
     })
+
+    test('TC - 06 Search without parameter fails (negative) ', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/searchProduct', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({}).toString(),
+        });
+
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(400);
+        expect(json.message).toEqual("Bad request, search_product parameter is missing in POST request.");
+    })
+
 
 
 

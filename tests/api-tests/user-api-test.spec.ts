@@ -61,13 +61,84 @@ test.describe('User API - happy path (create/delete)', () => {
                 password: USER_PASSWORD,
             }).toString(),
         });
+        expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(200);
-        expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("User exists!");
+    });
+
+    test('TC - 03 Get User Account by Email', async ({ request }) => {
+        const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(200);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json).toEqual(
+            expect.objectContaining({
+                responseCode: 200,
+                user: expect.any(Object),
+            })
+        );
+        expect(json.user).toEqual(
+            expect.objectContaining({
+                id: expect.any(Number),
+                name: expect.stringMatching(/\S/),
+                email: expect.stringMatching(/\S/),
+                title: expect.stringMatching(/\S/),
+                birth_day: expect.stringMatching(/\S/),
+                birth_month: expect.stringMatching(/\S/),
+                birth_year: expect.stringMatching(/\S/),
+                first_name: expect.stringMatching(/\S/),
+                last_name: expect.stringMatching(/\S/),
+                company: expect.stringMatching(/\S/),
+                address1: expect.stringMatching(/\S/),
+                address2: expect.stringMatching(/\S/),
+                country: expect.stringMatching(/\S/),
+                state: expect.stringMatching(/\S/),
+                city: expect.stringMatching(/\S/),
+                zipcode: expect.stringMatching(/\S/),
+            }),
+        )
+    });
+
+    test('TC - 04 Update User Account', async ({ request }) => {
+        const NEW_ADDRESS1 = 'Ha Shoshan 10';
+        const NEW_ADDRESS2 = 'Ha Shaked 20';
+        const NEW_ZIPCODE = '222222';
+        const NEW_CITY = 'Sabion';
+
+        const form = new URLSearchParams({
+            email: USER_EMAIL,
+            password: USER_PASSWORD,
+            address1: NEW_ADDRESS1,
+            address2: NEW_ADDRESS2,
+            zipcode: NEW_ZIPCODE,
+            city: NEW_CITY,
+        }).toString();
+
+        const res = await request.put('https://automationexercise.com/api/updateAccount', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: form,
+        });
+
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(200);
+        expect(json.message).toEqual("User updated!");
+        console.log('UPDATED FIELDS =>', {
+            address1: NEW_ADDRESS1,
+            address2: NEW_ADDRESS2,
+            zipcode: NEW_ZIPCODE,
+            city: NEW_CITY,
+        });
     })
+
+
 
 
 

@@ -95,6 +95,46 @@ test.describe('Products API', () => {
         expect(json.responseCode).toEqual(405);
         expect(json.message).toEqual("This request method is not supported.");
 
+    });
+
+    test('TC - 05 Search product by keyword returns filtered results', async ({ request }) => {
+        const keyword = 'top';
+        const res = await request.post("https://automationexercise.com/api/searchProduct", {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({ search_product: keyword }).toString(),
+        })
+
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        console.log(json.products.length, 'products length');
+        expect(json.products.length, 'products length').toBe(14);
+        for (const p of json.products) {
+            expect(p).toEqual(
+                expect.objectContaining({
+                    id: expect.any(Number),
+                    name: expect.stringMatching(/\S/),
+                    price: expect.stringMatching(/\S/),
+                    brand: expect.stringMatching(/\S/),
+                    category: expect.objectContaining({
+                        usertype: expect.objectContaining({
+                            usertype: expect.stringMatching(/\S/),
+                        }),
+                        category: expect.stringMatching(/\S/),
+                    }),
+                })
+            );
+
+            // Coincidencia con el término de búsqueda en alguno de los campos relevantes
+            const thereIsACoincidence =
+                String(p.name).toLowerCase().includes(keyword.toLowerCase()) ||
+                String(p.brand).toLowerCase().includes(keyword.toLowerCase()) ||
+                String(p.category?.category ?? '').toLowerCase().includes(keyword.toLowerCase()) ||
+                String(p.category?.usertype?.usertype ?? '').toLowerCase().includes(keyword.toLowerCase());
+
+            expect(thereIsACoincidence).toBeTruthy();
+        }
     })
 
 
@@ -102,4 +142,7 @@ test.describe('Products API', () => {
 
 
 
+
 })
+
+

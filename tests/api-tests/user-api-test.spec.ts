@@ -136,7 +136,66 @@ test.describe('User API - happy path (create/delete)', () => {
             zipcode: NEW_ZIPCODE,
             city: NEW_CITY,
         });
+    });
+
+    test('TC -05 Get User Account by Email', async ({ request }) => {
+        const EXPECTED_ADDRESS1 = 'Ha Shoshan 10';
+        const EXPECTED_ADDRESS2 = 'Ha Shaked 20';
+        const EXPECTED_ZIPCODE = '222222';
+        const EXPECTED_CITY = 'Sabion';
+        const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(200);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json).toEqual(
+            expect.objectContaining({
+                responseCode: 200,
+                user: expect.any(Object),
+            })
+        );
+        expect(json.user).toEqual(
+            expect.objectContaining({
+                id: expect.any(Number),
+                name: expect.stringMatching(/\S/),
+                email: expect.stringMatching(/\S/),
+                title: expect.stringMatching(/\S/),
+                birth_day: expect.stringMatching(/\S/),
+                birth_month: expect.stringMatching(/\S/),
+                birth_year: expect.stringMatching(/\S/),
+                first_name: expect.stringMatching(/\S/),
+                last_name: expect.stringMatching(/\S/),
+                company: expect.stringMatching(/\S/),
+                address1: EXPECTED_ADDRESS1,
+                address2: EXPECTED_ADDRESS2,
+                country: expect.stringMatching(/\S/),
+                state: expect.stringMatching(/\S/),
+                city: EXPECTED_CITY,
+                zipcode: EXPECTED_ZIPCODE,
+            }),
+
+
+        )
+    });
+
+    test('TC - 06 Delete User Account', async ({ request }) => {
+        const res = await request.delete('https://automationexercise.com/api/deleteAccount', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(200);
+        expect(json.message).toEqual("Account deleted!");
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
     })
+
+
 
 
 

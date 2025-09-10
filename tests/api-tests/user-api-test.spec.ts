@@ -25,7 +25,7 @@ test.describe('User API - happy path (create/delete)', () => {
             name: USER_NAME,
             email: USER_EMAIL,
             password: USER_PASSWORD,
-            gender: "Mr",
+            title: "Mr",
             birth_date: "11",
             birth_month: "12",
             birth_year: "1975",

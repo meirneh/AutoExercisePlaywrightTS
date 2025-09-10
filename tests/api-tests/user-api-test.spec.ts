@@ -70,7 +70,10 @@ test.describe('User API - happy path (create/delete)', () => {
     });
 
     test('TC - 03 Get User Account by Email', async ({ request }) => {
-        const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        // const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        //   const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}");
+        const url = `https://automationexercise.com//api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}`;
+        const res = await request.get(url);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
@@ -138,7 +141,7 @@ test.describe('User API - happy path (create/delete)', () => {
         });
     });
 
-    test('TC -05 Get User Account by Email', async ({ request }) => {
+    test('TC - 05 Get User Account by Email', async ({ request }) => {
         const EXPECTED_ADDRESS1 = 'Ha Shoshan 10';
         const EXPECTED_ADDRESS2 = 'Ha Shaked 20';
         const EXPECTED_ZIPCODE = '222222';

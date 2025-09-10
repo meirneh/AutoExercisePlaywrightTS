@@ -9,6 +9,7 @@ function safeParse(text: string): any | null {
         }
         return null;
     }
+
 }
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
@@ -99,7 +100,7 @@ test.describe('Products API', () => {
         const res = await request.post("https://automationexercise.com/api/searchProduct", {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({ search_product: keyword }).toString(),
-        })
+        });
 
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
@@ -131,7 +132,7 @@ test.describe('Products API', () => {
 
             expect(thereIsACoincidence).toBeTruthy();
         }
-    })
+    });
 
     test('TC - 06 Search without parameter fails (negative) ', async ({ request }) => {
         const res = await request.post('https://automationexercise.com/api/searchProduct', {
@@ -144,14 +145,7 @@ test.describe('Products API', () => {
         const json = safeParse(bodyText);
         expect(json.responseCode).toEqual(400);
         expect(json.message).toEqual("Bad request, search_product parameter is missing in POST request.");
-    })
-
-
-
-
-
-
-
+    });
 
 })
 

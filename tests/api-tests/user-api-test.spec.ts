@@ -51,9 +51,24 @@ test.describe('User API - happy path (create/delete)', () => {
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(201);
         expect(json.message).toEqual("User created!");
+    });
 
-
+    test('TC - 02 Verify Login ', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(200);
+        expect(json.responseCode).toEqual(200);
+        expect(json.message).toEqual("User exists!");
     })
+
 
 
 })

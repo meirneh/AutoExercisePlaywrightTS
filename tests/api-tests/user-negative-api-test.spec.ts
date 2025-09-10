@@ -11,7 +11,7 @@ function safeParse(text: string): any | null {
     }
 }
 test.describe('Products API', () => {
-    test('TC-01: GET returns full product list', async ({ request }) => {
+    test('TC - 01: GET returns full product list', async ({ request }) => {
         const res = await request.get('https://automationexercise.com/api/productsList');
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
@@ -31,14 +31,14 @@ test.describe('Products API', () => {
             expect(p).toEqual(
                 expect.objectContaining({
                     id: expect.any(Number),
-                    name: expect.any(String),
-                    price: expect.any(String),
-                    brand: expect.any(String),
+                    name: expect.stringMatching(/\S/),
+                    price: expect.stringMatching(/\S/),
+                    brand: expect.stringMatching(/\S/),
                     category: expect.objectContaining({
                         usertype: expect.objectContaining({
-                            usertype: expect.any(String),
+                            usertype: expect.stringMatching(/\S/),
                         }),
-                        category: expect.any(String),
+                        category: expect.stringMatching(/\S/),
                     })
 
 
@@ -46,7 +46,50 @@ test.describe('Products API', () => {
 
             )
         }
+    });
+
+    test('TC - 02: POST to product list is not allowed (negative) ', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/productsList');
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(405);
+        expect(json.message).toEqual("This request method is not supported.");
+
+    });
+
+    test('TC - 03 GET returns brands list ', async ({ request }) => {
+        const res = await request.get('https://automationexercise.com/api/brandsList');
+        expect(res.status(), 'status code').toBe(200);
+
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(200);
+        expect(json.brands.length, 'brands length').toBe(34);
+        expect(json, 'JSON parseable').toBeTruthy();
+        expect(json).toEqual(
+            expect.objectContaining({
+                responseCode: 200,
+                brands: expect.any(Array),
+            })
+        );
+
+        for (const b of json.brands) {
+            expect(b).toEqual(
+                expect.objectContaining({
+                    id: expect.any(Number),
+                    brand: expect.stringMatching(/\S/),
+                }),
+
+            )
+        }
+
+
+
     })
+
+
 
 
 

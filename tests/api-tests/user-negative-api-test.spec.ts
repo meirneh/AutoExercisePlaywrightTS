@@ -48,7 +48,7 @@ test.describe('Products API', () => {
         }
     });
 
-    test('TC - 02: POST to product list is not allowed (negative) ', async ({ request }) => {
+    test('TC - 02: POST to product list is not supported (negative) ', async ({ request }) => {
         const res = await request.post('https://automationexercise.com/api/productsList');
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
@@ -84,10 +84,19 @@ test.describe('Products API', () => {
 
             )
         }
+    });
 
-
+    test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/brandsList');
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(405);
+        expect(json.message).toEqual("This request method is not supported.");
 
     })
+
 
 
 

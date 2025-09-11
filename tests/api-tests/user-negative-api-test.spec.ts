@@ -132,10 +132,10 @@ test.describe('User API - negative (create/delete)', () => {
         const json = safeParse(bodyText);
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(404);
-         expect(json.message).toEqual("User not found!");
+        expect(json.message).toEqual("User not found!");
     });
 
-     test('TC - 06 Verify Login with invalid password', async ({ request }) => {
+    test('TC - 06 Verify Login with invalid password', async ({ request }) => {
         const res = await request.post('https://automationexercise.com/api/verifyLogin', {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({
@@ -148,7 +148,39 @@ test.describe('User API - negative (create/delete)', () => {
         const json = safeParse(bodyText);
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(404);
-         expect(json.message).toEqual("User not found!");
+        expect(json.message).toEqual("User not found!");
+    });
+
+    test('TC - 07 DEL To Verify Login (method not supported)', async ({ request }) => {
+        const res = await request.delete('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(405);
+        expect(json.message).toEqual("This request method is not supported.");
+    });
+
+    test('TC - 08 Delete User Account', async ({ request }) => {
+        const res = await request.delete('https://automationexercise.com/api/deleteAccount', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        expect(json.responseCode).toEqual(200);
+        expect(json.message).toEqual("Account deleted!");
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
     });
 
 

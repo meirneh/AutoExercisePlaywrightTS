@@ -14,8 +14,6 @@ function safeParse(text: string): any | null {
 }
 
 const USER_EMAIL = "cohen@gmail.com";
-const USER_PASSWORD = "1234";
-const USER_NAME = "Haim Cohen";
 
 const API = {
     CREATE: "https://automationexercise.com/api/createAccount",

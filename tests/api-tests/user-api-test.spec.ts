@@ -17,61 +17,134 @@ const USER_EMAIL = "cohen@gmail.com";
 const USER_PASSWORD = "1234";
 const USER_NAME = "Haim Cohen";
 
+const API = {
+    CREATE: "https://automationexercise.com/api/createAccount",
+    LOGIN: "https://automationexercise.com/api/verifyLogin",
+    GET_BY_EMAIL: "https://automationexercise.com/api/getUserDetailByEmail",
+    UPDATE: "https://automationexercise.com/api/updateAccount",
+    DELETE: "https://automationexercise.com/api/deleteAccount",
+};
+
+const FORM_HEADERS = { "Content-Type": "application/x-www-form-urlencoded" };
+
+const USER = {
+    name: "Haim Cohen",
+    email: "cohen@gmail.com",
+    password: "1234",
+    title: "Mr",
+    birth_date: "11",
+    birth_month: "12",
+    birth_year: "1975",
+    firstname: "Haim",
+    lastname: "Cohen",
+    company: "Cohen.td",
+    address1: "Ha Iasmin 10",
+    address2: "Ha Zayt 20",
+    country: "Israel",
+    state: "Central District",
+    city: "Tel Aviv",
+    zipcode: "12345",
+    mobile_number: "050-1234567",
+};
+
+// Valores “nuevos” para el update (TC-04)
+const UPDATED = {
+    address1: "Ha Shoshan 10",
+    address2: "Ha Shaked 20",
+    zipcode: "222222",
+    city: "Sabion",
+};
+
+
 test.describe('User API - happy path (create/delete)', () => {
 
     test('TC - 01 Create/Register User Account ', async ({ request }) => {
 
+        /*  const form = new URLSearchParams({
+             name: USER_NAME,
+             email: USER_EMAIL,
+             password: USER_PASSWORD,
+             title: "Mr",
+             birth_date: "11",
+             birth_month: "12",
+             birth_year: "1975",
+             firstname: "Haim",
+             lastname: "Cohen",
+             company: "Cohen.td",
+             address1: "Ha Iasmin 10",
+             address2: "Ha Zayt 20",
+             country: "Israel",
+             state: "Central District",
+             city: "Tel Aviv",
+             zipcode: "12345",
+             mobile_number: "050-1234567"
+         }).toString(); */
+
         const form = new URLSearchParams({
-            name: USER_NAME,
-            email: USER_EMAIL,
-            password: USER_PASSWORD,
-            title: "Mr",
-            birth_date: "11",
-            birth_month: "12",
-            birth_year: "1975",
-            firstname: "Haim",
-            lastname: "Cohen",
-            company: "Cohen.td",
-            address1: "Ha Iasmin 10",
-            address2: "Ha Zayt 20",
-            country: "Israel",
-            state: "Central District",
-            city: "Tel Aviv",
-            zipcode: "12345",
-            mobile_number: "050-1234567"
+            name: USER.name,
+            email: USER.email,
+            password: USER.password,
+            title: USER.title,
+            birth_date: USER.birth_date,
+            birth_month: USER.birth_month,
+            birth_year: USER.birth_year,
+            firstname: USER.firstname,
+            lastname: USER.lastname,
+            company: USER.company,
+            address1: USER.address1,
+            address2: USER.address2,
+            country: USER.country,
+            state: USER.state,
+            city: USER.city,
+            zipcode: USER.zipcode,
+            mobile_number: USER.mobile_number,
         }).toString();
 
-        const res = await request.post('https://automationexercise.com/api/createAccount', {
+        /* const res = await request.post('https://automationexercise.com/api/createAccount', {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: form,
+        }); */
+
+        const res = await request.post(API.CREATE, {
+            headers: FORM_HEADERS,
             data: form,
         });
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        // console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(201);
         expect(json.message).toEqual("User created!");
     });
 
     test('TC - 02 Verify Login ', async ({ request }) => {
-        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        /*  const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+             data: new URLSearchParams({
+                 email: USER_EMAIL,
+                 password: USER_PASSWORD,
+             }).toString(),
+         }); */
+
+        const res = await request.post(API.LOGIN, {
+            headers: FORM_HEADERS,
             data: new URLSearchParams({
-                email: USER_EMAIL,
-                password: USER_PASSWORD,
+                email: USER.email,
+                password: USER.password,
             }).toString(),
         });
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        // console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("User exists!");
     });
 
     test('TC - 03 Get User Account by Email', async ({ request }) => {
         const url = `https://automationexercise.com//api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}`;
-        const res = await request.get(url);
+        // const res = await request.get(url);
+        const res = await request.get(`${API.GET_BY_EMAIL}?email=${encodeURIComponent(USER.email)}`);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
@@ -111,17 +184,31 @@ test.describe('User API - happy path (create/delete)', () => {
         const NEW_ZIPCODE = '222222';
         const NEW_CITY = 'Sabion';
 
-        const form = new URLSearchParams({
+        /* const form = new URLSearchParams({
             email: USER_EMAIL,
             password: USER_PASSWORD,
             address1: NEW_ADDRESS1,
             address2: NEW_ADDRESS2,
             zipcode: NEW_ZIPCODE,
             city: NEW_CITY,
+        }).toString(); */
+
+        const form = new URLSearchParams({
+            email: USER.email,
+            password: USER.password,
+            address1: UPDATED.address1,
+            address2: UPDATED.address2,
+            zipcode: UPDATED.zipcode,
+            city: UPDATED.city,
         }).toString();
 
-        const res = await request.put('https://automationexercise.com/api/updateAccount', {
+        /* const res = await request.put('https://automationexercise.com/api/updateAccount', {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: form,
+        }); */
+
+        const res = await request.put(API.UPDATE, {
+            headers: FORM_HEADERS,
             data: form,
         });
 
@@ -131,12 +218,12 @@ test.describe('User API - happy path (create/delete)', () => {
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("User updated!");
-        console.log('UPDATED FIELDS =>', {
+        /* console.log('UPDATED FIELDS =>', {
             address1: NEW_ADDRESS1,
             address2: NEW_ADDRESS2,
             zipcode: NEW_ZIPCODE,
             city: NEW_CITY,
-        });
+        }); */
     });
 
     test('TC - 05 Get User Account by Email', async ({ request }) => {
@@ -144,7 +231,9 @@ test.describe('User API - happy path (create/delete)', () => {
         const EXPECTED_ADDRESS2 = 'Ha Shaked 20';
         const EXPECTED_ZIPCODE = '222222';
         const EXPECTED_CITY = 'Sabion';
-        const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        // const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
+        const res = await request.get(`${API.GET_BY_EMAIL}?email=${encodeURIComponent(USER.email)}`);
+
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
@@ -156,6 +245,27 @@ test.describe('User API - happy path (create/delete)', () => {
                 user: expect.any(Object),
             })
         );
+        /*  expect(json.user).toEqual(
+             expect.objectContaining({
+                 id: expect.any(Number),
+                 name: expect.stringMatching(/\S/),
+                 email: expect.stringMatching(/\S/),
+                 title: expect.stringMatching(/\S/),
+                 birth_day: expect.stringMatching(/\S/),
+                 birth_month: expect.stringMatching(/\S/),
+                 birth_year: expect.stringMatching(/\S/),
+                 first_name: expect.stringMatching(/\S/),
+                 last_name: expect.stringMatching(/\S/),
+                 company: expect.stringMatching(/\S/),
+                 address1: EXPECTED_ADDRESS1,
+                 address2: EXPECTED_ADDRESS2,
+                 country: expect.stringMatching(/\S/),
+                 state: expect.stringMatching(/\S/),
+                 city: EXPECTED_CITY,
+                 zipcode: EXPECTED_ZIPCODE,
+             }),
+         ) */
+
         expect(json.user).toEqual(
             expect.objectContaining({
                 id: expect.any(Number),
@@ -168,24 +278,29 @@ test.describe('User API - happy path (create/delete)', () => {
                 first_name: expect.stringMatching(/\S/),
                 last_name: expect.stringMatching(/\S/),
                 company: expect.stringMatching(/\S/),
-                address1: EXPECTED_ADDRESS1,
-                address2: EXPECTED_ADDRESS2,
+                address1: UPDATED.address1,
+                address2: UPDATED.address2,
                 country: expect.stringMatching(/\S/),
                 state: expect.stringMatching(/\S/),
-                city: EXPECTED_CITY,
-                zipcode: EXPECTED_ZIPCODE,
-            }),
-
-
-        )
+                zipcode: UPDATED.zipcode,
+                city: UPDATED.city,
+            })
+        );
     });
 
     test('TC - 06 Delete User Account', async ({ request }) => {
-        const res = await request.delete('https://automationexercise.com/api/deleteAccount', {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        /*  const res = await request.delete('https://automationexercise.com/api/deleteAccount', {
+             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+             data: new URLSearchParams({
+                 email: USER_EMAIL,
+                 password: USER_PASSWORD,
+             }).toString(),
+         }); */
+        const res = await request.delete(API.DELETE, {
+            headers: FORM_HEADERS,
             data: new URLSearchParams({
-                email: USER_EMAIL,
-                password: USER_PASSWORD,
+                email: USER.email,
+                password: USER.password,
             }).toString(),
         });
         expect(res.status(), 'status code').toBe(200);
@@ -193,16 +308,6 @@ test.describe('User API - happy path (create/delete)', () => {
         const json = safeParse(bodyText);
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("Account deleted!");
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        // console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
     });
-
-   
-    
-
-
-
-
-
-
-
 })

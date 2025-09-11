@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { userData } from "../../utils/data-test/users";
 
 function safeParse(text: string): any | null {
     try {
@@ -13,6 +14,12 @@ function safeParse(text: string): any | null {
 
 }
 
+async function parse(res: Response | any) {
+    const bodyText = await res.text();
+    return safeParse(bodyText);
+}
+
+
 const API = {
     CREATE: "https://automationexercise.com/api/createAccount",
     LOGIN: "https://automationexercise.com/api/verifyLogin",
@@ -24,28 +31,25 @@ const API = {
 const FORM_HEADERS = { "Content-Type": "application/x-www-form-urlencoded" };
 
 const USER = {
-    name: "Haim Cohen",
-    email: "cohen@gmail.com",
-    password: "1234",
-    title: "Mr",
-    birth_day: "1",
-    birth_month: "1",
-    birth_year: "1990",
-    firstname: "Haim",
-    lastname: "Cohen",
-    company: "MyCompany",
-    address1: "Ha Iasmin 10",
-    address2: "Ha Zayt 2",
-    country: "Israel",
-    state: "Center",
-    city: "Raanana",
-    zipcode: "111111",
-    mobile_number: "0500000000",
+    title: userData.accountInfo.gender,
+    name: userData.accountInfo.name,
+    email: userData.accountInfo.email,
+    password: userData.accountInfo.password,
+    birth_day: userData.birthDate.day,
+    birth_month: userData.birthDate.month,
+    birth_year: userData.birthDate.year,
+    firstname: userData.address.firstName,
+    lastname: userData.address.lastName,
+    company: userData.address.company,
+    address1: userData.address.address1,
+    address2: userData.address.address2,
+    country: userData.address.country,
+    state: userData.address.state,
+    city: userData.address.city,
+    zipcode: userData.address.zipcode,
+    mobile_number: userData.address.mobileNumber,
 };
 
-const USER_EMAIL = "cohen@gmail.com";
-const USER_PASSWORD = "1234";
-const USER_NAME = "Haim Cohen";
 const INVALID = {
     noRegistered: "levi@gmail.com",
     wrongPassword: "4321",
@@ -57,23 +61,23 @@ test.describe('User API - negative (create/delete)', () => {
     test('TC - 01 Create/Register User Account ', async ({ request }) => {
 
         const form = new URLSearchParams({
-            name: USER_NAME,
-            email: USER_EMAIL,
-            password: USER_PASSWORD,
-            title: "Mr",
-            birth_date: "11",
-            birth_month: "12",
-            birth_year: "1975",
-            firstname: "Haim",
-            lastname: "Cohen",
-            company: "Cohen.td",
-            address1: "Ha Iasmin 10",
-            address2: "Ha Zayt 20",
-            country: "Israel",
-            state: "Central District",
-            city: "Tel Aviv",
-            zipcode: "12345",
-            mobile_number: "050-1234567"
+            name: USER.name,
+            email: USER.email,
+            password: USER.password,
+            title: USER.title,
+            birth_day: USER.birth_day,
+            birth_month: USER.birth_month,
+            birth_year: USER.birth_year,
+            firstname: USER.firstname,
+            lastname: USER.lastname,
+            company: USER.company,
+            address1: USER.address1,
+            address2: USER.address2,
+            country: USER.country,
+            state: USER.state,
+            city: USER.city,
+            zipcode: USER.zipcode,
+            mobile_number: USER.mobile_number,
         }).toString();
 
         const res = await request.post(API.CREATE, {
@@ -82,32 +86,32 @@ test.describe('User API - negative (create/delete)', () => {
         });
 
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(201);
         expect(json.message).toEqual("User created!");
     });
 
     test('TC - 02 Create/Register User Account with registered email (negative) ', async ({ request }) => {
         const form = new URLSearchParams({
-            name: USER_NAME,
-            email: USER_EMAIL,
-            password: USER_PASSWORD,
-            title: "Mr",
-            birth_date: "11",
-            birth_month: "12",
-            birth_year: "1975",
-            firstname: "Haim",
-            lastname: "Cohen",
-            company: "Cohen.td",
-            address1: "Ha Iasmin 10",
-            address2: "Ha Zayt 20",
-            country: "Israel",
-            state: "Central District",
-            city: "Tel Aviv",
-            zipcode: "12345",
-            mobile_number: "050-1234567"
+            name: USER.name,
+            email: USER.email,
+            password: USER.password,
+            title: USER.title,
+            birth_day: USER.birth_day,
+            birth_month: USER.birth_month,
+            birth_year: USER.birth_year,
+            firstname: USER.firstname,
+            lastname: USER.lastname,
+            company: USER.company,
+            address1: USER.address1,
+            address2: USER.address2,
+            country: USER.country,
+            state: USER.state,
+            city: USER.city,
+            zipcode: USER.zipcode,
+            mobile_number: USER.mobile_number,
         }).toString();
+
 
         const res = await request.post(API.CREATE, {
             headers: FORM_HEADERS,
@@ -115,8 +119,7 @@ test.describe('User API - negative (create/delete)', () => {
         });
 
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(400);
         expect(json.message).toEqual("Email already exists!");

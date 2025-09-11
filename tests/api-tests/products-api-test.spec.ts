@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { QUERY as PRODUCT_SEARCH_QUERY } from "../../utils/data-test/product";
 function safeParse(text: string): any | null {
     try {
         return JSON.parse(text);
@@ -15,12 +16,12 @@ function safeParse(text: string): any | null {
 const API = {
     PRODUCTS: 'https://automationexercise.com/api/productsList',
     BRANDS: 'https://automationexercise.com//api/brandsList',
-    SEARCH: 'https://automationexercise.com//api/searchProduct',
+    SEARCH: "https://automationexercise.com/api/searchProduct",
 }
 
 const EXPECTED_PRODUCT_COUNT = 34;
 const EXPECTED_BRAND_COUNT = 34;
-const EXPECTED_SEARCH_COUNT = 14;
+const EXPECTED_SEARCH_COUNT = 6;
 
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
@@ -107,7 +108,8 @@ test.describe('Products API', () => {
     });
 
     test('TC - 05 Search product by keyword returns filtered results', async ({ request }) => {
-        const keyword = 'top';
+        // const keyword = 'top';
+        const keyword = PRODUCT_SEARCH_QUERY
         const res = await request.post(API.SEARCH, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({ search_product: keyword }).toString(),

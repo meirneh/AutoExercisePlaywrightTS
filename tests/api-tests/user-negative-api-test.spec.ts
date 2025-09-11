@@ -16,6 +16,8 @@ function safeParse(text: string): any | null {
 const USER_EMAIL = "cohen@gmail.com";
 const USER_PASSWORD = "1234";
 const USER_NAME = "Haim Cohen";
+const INVALID_USER_EMAIL = "levi@gmail.com";
+const INVALID_USER_PASSWORD = "4321";
 
 
 test.describe('User API - negative (create/delete)', () => {
@@ -86,6 +88,73 @@ test.describe('User API - negative (create/delete)', () => {
         expect(json.responseCode).toEqual(400);
         expect(json.message).toEqual("Email already exists!");
     });
+
+    test('TC - 03 POST To Verify Login without email parameter ', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(400);
+        expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
+    });
+
+    test('TC - 04 To Verify Login without password parameter', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(400);
+        expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
+    })
+
+    test('TC - 05 Verify Login with invalid email', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: INVALID_USER_EMAIL,
+                password: USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(404);
+         expect(json.message).toEqual("User not found!");
+    });
+
+     test('TC - 06 Verify Login with invalid password', async ({ request }) => {
+        const res = await request.post('https://automationexercise.com/api/verifyLogin', {
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            data: new URLSearchParams({
+                email: USER_EMAIL,
+                password: INVALID_USER_PASSWORD,
+            }).toString(),
+        });
+        expect(res.status(), 'status code').toBe(200);
+        const bodyText = await res.text();
+        const json = safeParse(bodyText);
+        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        expect(json.responseCode).toEqual(404);
+         expect(json.message).toEqual("User not found!");
+    });
+
+
+
+
+
 
 
 })

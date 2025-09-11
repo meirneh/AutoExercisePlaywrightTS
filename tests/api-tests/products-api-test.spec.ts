@@ -24,7 +24,6 @@ const EXPECTED_SEARCH_COUNT = 14;
 
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
-        // const res = await request.get('https://automationexercise.com/api/productsList');
         const res = await request.get(API.PRODUCTS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
@@ -61,7 +60,6 @@ test.describe('Products API', () => {
     });
 
     test('TC - 02: POST to product list is not supported (negative) ', async ({ request }) => {
-        // const res = await request.post('https://automationexercise.com/api/productsList');
         const res = await request.post(API.PRODUCTS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
@@ -72,7 +70,6 @@ test.describe('Products API', () => {
     });
 
     test('TC - 03 GET returns brands list ', async ({ request }) => {
-        // const res = await request.get('https://automationexercise.com/api/brandsList');
         const res = await request.get(API.BRANDS);
         expect(res.status(), 'status code').toBe(200);
 
@@ -100,7 +97,6 @@ test.describe('Products API', () => {
     });
 
     test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
-        // const res = await request.post('https://automationexercise.com/api/brandsList');
         const res = await request.post(API.BRANDS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();

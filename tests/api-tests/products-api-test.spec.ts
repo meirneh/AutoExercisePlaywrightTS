@@ -3,7 +3,7 @@ function safeParse(text: string): any | null {
     try {
         return JSON.parse(text);
     } catch {
-        const match = text.match(/{[\s\S]*}/); // intenta extraer JSON dentro de HTML
+        const match = text.match(/{[\s\S]*}/); // tries to extract JSON into HTML
         if (match) {
             try { return JSON.parse(match[0]); } catch { return null; }
         }
@@ -11,13 +11,25 @@ function safeParse(text: string): any | null {
     }
 
 }
+
+const API = {
+    PRODUCTS: 'https://automationexercise.com/api/productsList',
+    BRANDS: 'https://automationexercise.com//api/brandsList',
+    SEARCH: 'https://automationexercise.com//api/searchProduct',
+}
+
+const EXPECTED_PRODUCT_COUNT = 34;
+const EXPECTED_BRAND_COUNT = 34;
+const EXPECTED_SEARCH_COUNT = 14;
+
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
-        const res = await request.get('https://automationexercise.com/api/productsList');
+        // const res = await request.get('https://automationexercise.com/api/productsList');
+        const res = await request.get(API.PRODUCTS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-      
+
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
@@ -25,7 +37,7 @@ test.describe('Products API', () => {
                 products: expect.any(Array),
             })
         )
-        expect(json.products.length, 'products length').toBe(34);
+        expect(json.products.length, 'products length').toBe(EXPECTED_PRODUCT_COUNT);
 
         for (const p of json.products) {
             expect(p).toEqual(
@@ -49,7 +61,8 @@ test.describe('Products API', () => {
     });
 
     test('TC - 02: POST to product list is not supported (negative) ', async ({ request }) => {
-        const res = await request.post('https://automationexercise.com/api/productsList');
+        // const res = await request.post('https://automationexercise.com/api/productsList');
+        const res = await request.post(API.PRODUCTS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
@@ -59,13 +72,14 @@ test.describe('Products API', () => {
     });
 
     test('TC - 03 GET returns brands list ', async ({ request }) => {
-        const res = await request.get('https://automationexercise.com/api/brandsList');
+        // const res = await request.get('https://automationexercise.com/api/brandsList');
+        const res = await request.get(API.BRANDS);
         expect(res.status(), 'status code').toBe(200);
 
         const bodyText = await res.text();
         const json = safeParse(bodyText);
         expect(json.responseCode).toEqual(200);
-        expect(json.brands.length, 'brands length').toBe(34);
+        expect(json.brands.length, 'brands length').toBe(EXPECTED_BRAND_COUNT);
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
@@ -86,7 +100,8 @@ test.describe('Products API', () => {
     });
 
     test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
-        const res = await request.post('https://automationexercise.com/api/brandsList');
+        // const res = await request.post('https://automationexercise.com/api/brandsList');
+        const res = await request.post(API.BRANDS);
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
@@ -97,7 +112,7 @@ test.describe('Products API', () => {
 
     test('TC - 05 Search product by keyword returns filtered results', async ({ request }) => {
         const keyword = 'top';
-        const res = await request.post("https://automationexercise.com/api/searchProduct", {
+        const res = await request.post(API.SEARCH, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({ search_product: keyword }).toString(),
         });
@@ -106,7 +121,7 @@ test.describe('Products API', () => {
         const bodyText = await res.text();
         const json = safeParse(bodyText);
         console.log(json.products.length, 'products length');
-        expect(json.products.length, 'products length').toBe(14);
+        expect(json.products.length, 'products length').toBe(EXPECTED_SEARCH_COUNT);
         for (const p of json.products) {
             expect(p).toEqual(
                 expect.objectContaining({
@@ -135,7 +150,7 @@ test.describe('Products API', () => {
     });
 
     test('TC - 06 Search without parameter fails (negative) ', async ({ request }) => {
-        const res = await request.post('https://automationexercise.com/api/searchProduct', {
+        const res = await request.post(API.SEARCH, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({}).toString(),
         });

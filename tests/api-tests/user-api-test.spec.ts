@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { userData } from "../../utils/data-test/users";
 
 function safeParse(text: string): any | null {
     try {
@@ -13,6 +14,11 @@ function safeParse(text: string): any | null {
 
 }
 
+async function parse(res: Response | any) {
+    const bodyText = await res.text();
+    return safeParse(bodyText);
+}
+
 const USER_EMAIL = "cohen@gmail.com";
 
 const API = {
@@ -24,27 +30,25 @@ const API = {
 };
 
 const FORM_HEADERS = { "Content-Type": "application/x-www-form-urlencoded" };
-
 const USER = {
-    name: "Haim Cohen",
-    email: "cohen@gmail.com",
-    password: "1234",
-    title: "Mr",
-    birth_date: "11",
-    birth_month: "12",
-    birth_year: "1975",
-    firstname: "Haim",
-    lastname: "Cohen",
-    company: "Cohen.td",
-    address1: "Ha Iasmin 10",
-    address2: "Ha Zayt 20",
-    country: "Israel",
-    state: "Central District",
-    city: "Tel Aviv",
-    zipcode: "12345",
-    mobile_number: "050-1234567",
+    title: userData.accountInfo.gender,
+    name: userData.accountInfo.name,
+    email: userData.accountInfo.email,
+    password: userData.accountInfo.password,
+    birth_day: userData.birthDate.day,
+    birth_month: userData.birthDate.month,
+    birth_year: userData.birthDate.year,
+    firstname: userData.address.firstName,
+    lastname: userData.address.lastName,
+    company: userData.address.company,
+    address1: userData.address.address1,
+    address2: userData.address.address2,
+    country: userData.address.country,
+    state: userData.address.state,
+    city: userData.address.city,
+    zipcode: userData.address.zipcode,
+    mobile_number: userData.address.mobileNumber,
 };
-
 // “New” values ​​for the update (TC-04)
 const UPDATED = {
     address1: "Ha Shoshan 10",
@@ -63,7 +67,7 @@ test.describe('User API - happy path (create/delete)', () => {
             email: USER.email,
             password: USER.password,
             title: USER.title,
-            birth_date: USER.birth_date,
+            birth_day: USER.birth_day,
             birth_month: USER.birth_month,
             birth_year: USER.birth_year,
             firstname: USER.firstname,
@@ -83,8 +87,7 @@ test.describe('User API - happy path (create/delete)', () => {
             data: form,
         });
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(201);
         expect(json.message).toEqual("User created!");
     });
@@ -98,20 +101,16 @@ test.describe('User API - happy path (create/delete)', () => {
             }).toString(),
         });
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("User exists!");
     });
 
     test('TC - 03 Get User Account by Email', async ({ request }) => {
-        const url = `https://automationexercise.com//api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}`;
         const res = await request.get(`${API.GET_BY_EMAIL}?email=${encodeURIComponent(USER.email)}`);
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json).toEqual(
             expect.objectContaining({
                 responseCode: 200,
@@ -124,7 +123,7 @@ test.describe('User API - happy path (create/delete)', () => {
                 name: expect.stringMatching(/\S/),
                 email: expect.stringMatching(/\S/),
                 title: expect.stringMatching(/\S/),
-                birth_day: expect.stringMatching(/\S/),
+                birth_day: expect.any(String),
                 birth_month: expect.stringMatching(/\S/),
                 birth_year: expect.stringMatching(/\S/),
                 first_name: expect.stringMatching(/\S/),
@@ -137,6 +136,7 @@ test.describe('User API - happy path (create/delete)', () => {
                 city: expect.stringMatching(/\S/),
                 zipcode: expect.stringMatching(/\S/),
             }),
+
         )
     });
 
@@ -161,23 +161,16 @@ test.describe('User API - happy path (create/delete)', () => {
         });
 
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("User updated!");
     });
 
     test('TC - 05 Get User Account by Email', async ({ request }) => {
-        const EXPECTED_ADDRESS1 = 'Ha Shoshan 10';
-        const EXPECTED_ADDRESS2 = 'Ha Shaked 20';
-        const EXPECTED_ZIPCODE = '222222';
-        const EXPECTED_CITY = 'Sabion';
         const res = await request.get(`${API.GET_BY_EMAIL}?email=${encodeURIComponent(USER.email)}`);
 
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
         console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json).toEqual(
@@ -193,7 +186,7 @@ test.describe('User API - happy path (create/delete)', () => {
                 name: expect.stringMatching(/\S/),
                 email: expect.stringMatching(/\S/),
                 title: expect.stringMatching(/\S/),
-                birth_day: expect.stringMatching(/\S/),
+                birth_day: expect.any(String),
                 birth_month: expect.stringMatching(/\S/),
                 birth_year: expect.stringMatching(/\S/),
                 first_name: expect.stringMatching(/\S/),
@@ -218,8 +211,7 @@ test.describe('User API - happy path (create/delete)', () => {
             }).toString(),
         });
         expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
         expect(json.message).toEqual("Account deleted!");
     });

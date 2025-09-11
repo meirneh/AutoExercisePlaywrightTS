@@ -4,7 +4,7 @@ function safeParse(text: string): any | null {
     try {
         return JSON.parse(text);
     } catch {
-        const match = text.match(/{[\s\S]*}/); // intenta extraer JSON dentro de HTML
+        const match = text.match(/{[\s\S]*}/); // tries to extract JSON into HTML
         if (match) {
             try { return JSON.parse(match[0]); } catch { return null; }
         }
@@ -51,7 +51,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(201);
         expect(json.message).toEqual("User created!");
     });
@@ -99,7 +98,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(400);
         expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
     });
@@ -114,7 +112,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(400);
         expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
     })
@@ -130,7 +127,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(404);
         expect(json.message).toEqual("User not found!");
     });
@@ -146,7 +142,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(404);
         expect(json.message).toEqual("User not found!");
     });
@@ -162,7 +157,6 @@ test.describe('User API - negative (create/delete)', () => {
         expect(res.status(), 'status code').toBe(200);
         const bodyText = await res.text();
         const json = safeParse(bodyText);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
         expect(json.responseCode).toEqual(405);
         expect(json.message).toEqual("This request method is not supported.");
     });

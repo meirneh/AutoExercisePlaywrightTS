@@ -4,7 +4,7 @@ function safeParse(text: string): any | null {
     try {
         return JSON.parse(text);
     } catch {
-        const match = text.match(/{[\s\S]*}/); // intenta extraer JSON dentro de HTML
+        const match = text.match(/{[\s\S]*}/); // tries to extract JSON into HTML
         if (match) {
             try { return JSON.parse(match[0]); } catch { return null; }
         }
@@ -70,8 +70,6 @@ test.describe('User API - happy path (create/delete)', () => {
     });
 
     test('TC - 03 Get User Account by Email', async ({ request }) => {
-        // const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=cohen@gmail.com");
-        //   const res = await request.get("https://automationexercise.com/api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}");
         const url = `https://automationexercise.com//api/getUserDetailByEmail?email=${encodeURIComponent(USER_EMAIL)}`;
         const res = await request.get(url);
         expect(res.status(), 'status code').toBe(200);

@@ -18,6 +18,9 @@ export const UsersApiData = {
         responseCodes: {
             created: 201,
             ok: 200,
+            exist: 400,
+            notFound: 404,
+            methodNotSupported: 405, 
         },
     },
     messages: {
@@ -25,6 +28,10 @@ export const UsersApiData = {
         userExists: "User exists!",
         userUpdated: "User updated!",
         accountDeleted: "Account deleted!",
+        emailAlreadyExist: "Email already exists!",
+        userNotFound: "User not found!",
+        missingEmailOrPassword: "Bad request, email or password parameter is missing in POST request.",
+        methodNotSupported: "This request method is not supported.",
     },
 
 } as const;

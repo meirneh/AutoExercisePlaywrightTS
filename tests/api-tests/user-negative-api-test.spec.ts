@@ -1,5 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { userData } from "../../utils/data-test/users";
+import { UsersApiData, UserApiPayloads } from "../../utils/data-test/users-api"
+import { WRONG_EMAIL, WRONG_PASSWORD } from "../../utils/data-test/auth";
 
 function safeParse(text: string): any | null {
     try {
@@ -15,7 +17,7 @@ function safeParse(text: string): any | null {
 }
 
 async function parse(res: Response | any) {
-    const bodyText = await res.text();
+    const bodyText = await (res.text?.() ?? res.body?.text?.() ?? Promise.resolve(""));
     return safeParse(bodyText);
 }
 
@@ -28,60 +30,12 @@ const API = {
     DELETE: "https://automationexercise.com/api/deleteAccount",
 };
 
-const FORM_HEADERS = { "Content-Type": "application/x-www-form-urlencoded" };
-
-const USER = {
-    title: userData.accountInfo.gender,
-    name: userData.accountInfo.name,
-    email: userData.accountInfo.email,
-    password: userData.accountInfo.password,
-    birth_day: userData.birthDate.day,
-    birth_month: userData.birthDate.month,
-    birth_year: userData.birthDate.year,
-    firstname: userData.address.firstName,
-    lastname: userData.address.lastName,
-    company: userData.address.company,
-    address1: userData.address.address1,
-    address2: userData.address.address2,
-    country: userData.address.country,
-    state: userData.address.state,
-    city: userData.address.city,
-    zipcode: userData.address.zipcode,
-    mobile_number: userData.address.mobileNumber,
-};
-
-const INVALID = {
-    noRegistered: "levi@gmail.com",
-    wrongPassword: "4321",
-};
-
-
 test.describe('User API - negative (create/delete)', () => {
 
     test('TC - 01 Create/Register User Account ', async ({ request }) => {
-
-        const form = new URLSearchParams({
-            name: USER.name,
-            email: USER.email,
-            password: USER.password,
-            title: USER.title,
-            birth_day: USER.birth_day,
-            birth_month: USER.birth_month,
-            birth_year: USER.birth_year,
-            firstname: USER.firstname,
-            lastname: USER.lastname,
-            company: USER.company,
-            address1: USER.address1,
-            address2: USER.address2,
-            country: USER.country,
-            state: USER.state,
-            city: USER.city,
-            zipcode: USER.zipcode,
-            mobile_number: USER.mobile_number,
-        }).toString();
-
-        const res = await request.post(API.CREATE, {
-            headers: FORM_HEADERS,
+        const form = new URLSearchParams(UserApiPayloads.create()).toString();
+        const res = await request.post(UsersApiData.endpoints.create, {
+            headers: UsersApiData.headers.formUrlEncoded,
             data: form,
         });
 
@@ -92,128 +46,88 @@ test.describe('User API - negative (create/delete)', () => {
     });
 
     test('TC - 02 Create/Register User Account with registered email (negative) ', async ({ request }) => {
-        const form = new URLSearchParams({
-            name: USER.name,
-            email: USER.email,
-            password: USER.password,
-            title: USER.title,
-            birth_day: USER.birth_day,
-            birth_month: USER.birth_month,
-            birth_year: USER.birth_year,
-            firstname: USER.firstname,
-            lastname: USER.lastname,
-            company: USER.company,
-            address1: USER.address1,
-            address2: USER.address2,
-            country: USER.country,
-            state: USER.state,
-            city: USER.city,
-            zipcode: USER.zipcode,
-            mobile_number: USER.mobile_number,
-        }).toString();
 
-
-        const res = await request.post(API.CREATE, {
-            headers: FORM_HEADERS,
+        const form = new URLSearchParams(UserApiPayloads.create()).toString();
+        const res = await request.post(UsersApiData.endpoints.create, {
+            headers: UsersApiData.headers.formUrlEncoded,
             data: form,
         });
-
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        console.log('RESPONSE SCHEMA:\n', JSON.stringify(json, null, 2));
-        expect(json.responseCode).toEqual(400);
-        expect(json.message).toEqual("Email already exists!");
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.exist);
+        expect(json.message).toEqual(UsersApiData.messages.emailAlreadyExist);
     });
 
     test('TC - 03 POST To Verify Login without email parameter ', async ({ request }) => {
-
-        const res = await request.post(API.LOGIN, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                password: USER.password,
-            }).toString(),
+        const { password } = UserApiPayloads.login();
+        const res = await request.post(UsersApiData.endpoints.login, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams({ password }).toString()
         });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(400);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json = await parse(res);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.exist);
         expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
     });
 
     test('TC - 04 To Verify Login without password parameter', async ({ request }) => {
 
-        const res = await request.post(API.LOGIN, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                email: USER.email,
-            }).toString(),
+        const { email } = UserApiPayloads.login();
+        const res = await request.post(UsersApiData.endpoints.login, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams({ email }).toString()
         });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(400);
-        expect(json.message).toEqual("Bad request, email or password parameter is missing in POST request.");
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json = await parse(res)
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.exist);
+        expect(json.message).toEqual(UsersApiData.messages.missingEmailOrPassword);
     })
 
     test('TC - 05 Verify Login with invalid email', async ({ request }) => {
-
-        const res = await request.post(API.LOGIN, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                email: INVALID.noRegistered,
-                password: USER.password,
-            }).toString(),
+        const { password } = UserApiPayloads.login();
+        const res = await request.post(UsersApiData.endpoints.login, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams({ email: WRONG_EMAIL, password }).toString()
         });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(404);
-        expect(json.message).toEqual("User not found!");
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json = await parse(res);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.notFound);
+        expect(json.message).toEqual(UsersApiData.messages.userNotFound);
     });
 
     test('TC - 06 Verify Login with invalid password', async ({ request }) => {
-        const res = await request.post(API.LOGIN, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                email: USER.email,
-                password: INVALID.wrongPassword,
-            }).toString(),
-        });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(404);
-        expect(json.message).toEqual("User not found!");
+        const { email } = UserApiPayloads.login();
+        const res = await request.post(UsersApiData.endpoints.login, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams({ email, password: WRONG_PASSWORD }).toString(),
+        })
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json = await parse(res);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.notFound);
+        expect(json.message).toEqual(UsersApiData.messages.userNotFound);
     });
 
     test('TC - 07 DEL To Verify Login (method not supported)', async ({ request }) => {
-        const res = await request.delete(API.LOGIN, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                email: USER.email,
-                password: USER.password,
-            }).toString(),
-        });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(405);
-        expect(json.message).toEqual("This request method is not supported.");
+        const { email, password } = UserApiPayloads.login();
+        const res = await request.delete(UsersApiData.endpoints.login, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams({ email, password }).toString(),
+        })
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json = await parse(res);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.methodNotSupported);
+        expect(json.message).toEqual(UsersApiData.messages.methodNotSupported);
     });
 
     test('TC - 08 Delete User Account', async ({ request }) => {
-        const res = await request.delete(API.DELETE, {
-            headers: FORM_HEADERS,
-            data: new URLSearchParams({
-                email: USER.email,
-                password: USER.password,
-            }).toString(),
+        const res = await request.delete(UsersApiData.endpoints.delete, {
+            headers: UsersApiData.headers.formUrlEncoded,
+            data: new URLSearchParams(UserApiPayloads.delete()).toString(),
         });
-        expect(res.status(), 'status code').toBe(200);
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
-        expect(json.responseCode).toEqual(200);
-        expect(json.message).toEqual("Account deleted!");
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
+        const json: any = await parse(res);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
+        expect(json.message).toEqual(UsersApiData.messages.accountDeleted);
     });
 })
 

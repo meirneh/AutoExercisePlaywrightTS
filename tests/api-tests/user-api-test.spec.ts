@@ -15,7 +15,7 @@ function safeParse(text: string): any | null {
 }
 
 async function parse(res: Response | any) {
-    const bodyText = await res.text();
+    const bodyText = await (res.text?.() ?? res.body?.text?.() ?? Promise.resolve(""));
     return safeParse(bodyText);
 }
 

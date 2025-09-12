@@ -1,23 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { QUERY as PRODUCT_SEARCH_QUERY } from "../../utils/data-test/product";
 import { ProductsApiData } from "../../utils/data-test/products-api";
-function safeParse(text: string): any | null {
-    try {
-        return JSON.parse(text);
-    } catch {
-        const match = text.match(/{[\s\S]*}/); // tries to extract JSON into HTML
-        if (match) {
-            try { return JSON.parse(match[0]); } catch { return null; }
-        }
-        return null;
-    }
-
-}
-
-async function parse(res: Response | any) {
-    const bodyText = await (res.text?.() ?? res.body?.text?.() ?? Promise.resolve(""));
-    return safeParse(bodyText);
-}
+import { parse, FORM_URLENCODED_HEADER, toFormUrlEncoded } from "../../utils/helpers/apiHelpers"
 
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
@@ -67,9 +51,7 @@ test.describe('Products API', () => {
     test('TC - 03 GET returns brands list ', async ({ request }) => {
         const res = await request.get(ProductsApiData.endpoints.brands);
         expect(res.status(), 'status code').toBe(200);
-
-        const bodyText = await res.text();
-        const json = safeParse(bodyText);
+        const json: any = await parse(res);
         expect(json.responseCode).toEqual(200);
         expect(json.brands.length, 'brands length').toBe(ProductsApiData.expected.brandCount);
         expect(json, 'JSON parseable').toBeTruthy();
@@ -140,8 +122,8 @@ test.describe('Products API', () => {
 
     test('TC - 06 Search without parameter fails (negative) ', async ({ request }) => {
         const res = await request.post(ProductsApiData.endpoints.search, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            data: new URLSearchParams({}).toString(),
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded({}),
         });
 
         expect(res.status(), 'status code').toBe(200);

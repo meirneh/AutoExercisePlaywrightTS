@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { QUERY as PRODUCT_SEARCH_QUERY } from "../../utils/data-test/product";
+import { ProductsApiData } from "../../utils/data-test/products-api";
 function safeParse(text: string): any | null {
     try {
         return JSON.parse(text);
@@ -18,19 +19,9 @@ async function parse(res: Response | any) {
     return safeParse(bodyText);
 }
 
-const API = {
-    PRODUCTS: 'https://automationexercise.com/api/productsList',
-    BRANDS: 'https://automationexercise.com//api/brandsList',
-    SEARCH: "https://automationexercise.com/api/searchProduct",
-}
-
-const EXPECTED_PRODUCT_COUNT = 34;
-const EXPECTED_BRAND_COUNT = 34;
-const EXPECTED_SEARCH_COUNT = 6;
-
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
-        const res = await request.get(API.PRODUCTS);
+        const res = await request.get(ProductsApiData.endpoints.products)
         expect(res.status(), 'status code').toBe(200);
         const json: any = await parse(res);
 
@@ -41,7 +32,7 @@ test.describe('Products API', () => {
                 products: expect.any(Array),
             })
         )
-        expect(json.products.length, 'products length').toBe(EXPECTED_PRODUCT_COUNT);
+        expect(json.products.length, 'products length').toBe(ProductsApiData.expected.brandCount);
 
         for (const p of json.products) {
             expect(p).toEqual(
@@ -65,22 +56,22 @@ test.describe('Products API', () => {
     });
 
     test('TC - 02: POST to product list is not supported (negative) ', async ({ request }) => {
-        const res = await request.post(API.PRODUCTS);
+        const res = await request.post(ProductsApiData.endpoints.products)
         expect(res.status(), 'status code').toBe(200);
         const json: any = await parse(res);
         expect(json.responseCode).toEqual(405);
-        expect(json.message).toEqual("This request method is not supported.");
+        expect(json.message).toEqual(ProductsApiData.messages.methodNotSupported);
 
     });
 
     test('TC - 03 GET returns brands list ', async ({ request }) => {
-        const res = await request.get(API.BRANDS);
+        const res = await request.get(ProductsApiData.endpoints.brands);
         expect(res.status(), 'status code').toBe(200);
 
         const bodyText = await res.text();
         const json = safeParse(bodyText);
         expect(json.responseCode).toEqual(200);
-        expect(json.brands.length, 'brands length').toBe(EXPECTED_BRAND_COUNT);
+        expect(json.brands.length, 'brands length').toBe(ProductsApiData.expected.brandCount);
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
@@ -101,17 +92,17 @@ test.describe('Products API', () => {
     });
 
     test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
-        const res = await request.post(API.BRANDS);
+        const res = await request.post(ProductsApiData.endpoints.brands);
         expect(res.status(), 'status code').toBe(200);
         const json: any = await parse(res);
         expect(json.responseCode).toEqual(405);
-        expect(json.message).toEqual("This request method is not supported.");
+        expect(json.message).toEqual(ProductsApiData.messages.methodNotSupported);
 
     });
 
     test('TC - 05 Search product by keyword returns filtered results', async ({ request }) => {
         const keyword = PRODUCT_SEARCH_QUERY
-        const res = await request.post(API.SEARCH, {
+        const res = await request.post(ProductsApiData.endpoints.search, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({ search_product: keyword }).toString(),
         });
@@ -119,7 +110,7 @@ test.describe('Products API', () => {
         expect(res.status(), 'status code').toBe(200);
         const json: any = await parse(res);
         console.log(json.products.length, 'products length');
-        expect(json.products.length, 'products length').toBe(EXPECTED_SEARCH_COUNT);
+        expect(json.products.length, 'products length').toBe(ProductsApiData.expected.searchCount);
         for (const p of json.products) {
             expect(p).toEqual(
                 expect.objectContaining({
@@ -148,7 +139,7 @@ test.describe('Products API', () => {
     });
 
     test('TC - 06 Search without parameter fails (negative) ', async ({ request }) => {
-        const res = await request.post(API.SEARCH, {
+        const res = await request.post(ProductsApiData.endpoints.search, {
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             data: new URLSearchParams({}).toString(),
         });
@@ -156,7 +147,7 @@ test.describe('Products API', () => {
         expect(res.status(), 'status code').toBe(200);
         const json: any = await parse(res);
         expect(json.responseCode).toEqual(400);
-        expect(json.message).toEqual("Bad request, search_product parameter is missing in POST request.");
+        expect(json.message).toEqual(ProductsApiData.messages.missingSearchParam);
     });
 
 })

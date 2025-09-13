@@ -12,6 +12,9 @@ import SignUpPage from '../../pages/SignUpPage';
 import AccountCreatedPage from '../../pages/AccounCreatedPage';
 import AccountDeletedPage from '../../pages/AccountDeletedPage';
 import PaymentPage from '../../pages/PaymentPage';
+import type { APIResponse } from '@playwright/test';
+import { UsersApiData, UserApiPayloads } from '../data-test/users-api';
+import { FORM_URLENCODED_HEADER, toFormUrlEncoded, parse } from '../helpers/apiHelpers';
 
 type AppFixtures = {
   headerFooterPage: HeaderFooterPage;
@@ -25,6 +28,14 @@ type AppFixtures = {
   accountCreatedPage: AccountCreatedPage;
   accountDeletedPage: AccountDeletedPage;
   paymentPage: PaymentPage;
+};
+
+type ApiResponse<T = any> = { res: APIResponse; json: T };
+type ApiTools = {
+  createUser: () => Promise<ApiResponse>;
+  loginUser: () => Promise<ApiResponse>;
+  getUserByEmail: () => Promise<ApiResponse>;
+  deleteUser: () => Promise<ApiResponse>;
 };
 
 export const test = base.extend<AppFixtures>({
@@ -61,6 +72,47 @@ export const test = base.extend<AppFixtures>({
   paymentPage: async ({ page }, use) => {
     await use(new PaymentPage(page));
   },
-});
+
+})
+.extend<{ api: ApiTools }>({
+    api: async ({ request }, use) => {
+      const api: ApiTools = {
+        createUser: async () => {
+          const res = await request.post(UsersApiData.endpoints.create, {
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.create()),
+          });
+          const json = await parse(res);
+          return { res, json };
+        },
+        loginUser: async () => {
+          const res = await request.post(UsersApiData.endpoints.login, {
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.login()),
+          });
+          const json = await parse(res);
+          return { res, json };
+        },
+        getUserByEmail: async () => {
+          const { email } = UserApiPayloads.getByEmail();
+          const res = await request.get(
+            `${UsersApiData.endpoints.getByEmail}?email=${encodeURIComponent(email)}`
+          );
+          const json = await parse(res);
+          return { res, json };
+        },
+        deleteUser: async () => {
+          const res = await request.delete(UsersApiData.endpoints.delete, {
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.delete()),
+          });
+          const json = await parse(res);
+          return { res, json };
+        },
+      };
+
+      await use(api);
+    },
+  });
 
 export const expect = baseExpect;

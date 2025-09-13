@@ -1,40 +1,25 @@
-import { test, expect } from "@playwright/test";
+
+import { test, expect } from "../../utils/fixtures/fixtures";
 import { UsersApiData, UserApiPayloads, DefaultUpdate } from "../../utils/data-test/users-api";
 import { parse, toFormUrlEncoded, FORM_URLENCODED_HEADER } from "../../utils/helpers/apiHelpers"
 
 test.describe('User API - happy path (create/delete)', () => {
 
-    test('TC - 01 Create/Register User Account ', async ({ request }) => {
-        const form = new URLSearchParams(UserApiPayloads.create()).toString();
-        const res = await request.post(UsersApiData.endpoints.create, {
-            headers: FORM_URLENCODED_HEADER,
-            data: form,
-        });
-
-        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
+    test('TC - 01 Create/Register User Account ', async ({ api }) => {
+        const { res, json } = await api.createUser();
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.created);
         expect(json.message).toEqual(UsersApiData.messages.userCreated);
     });
 
-    test('TC - 02 Verify Login ', async ({ request }) => {
-        const res = await request.post(UsersApiData.endpoints.login, {
-            headers: FORM_URLENCODED_HEADER,
-            data: toFormUrlEncoded(UserApiPayloads.login())
-        })
-
-        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
+    test('TC - 02 Verify Login ', async ({ api }) => {
+        const { res, json } = await api.loginUser();
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json.message).toEqual(UsersApiData.messages.userExists);
     });
 
-    test('TC - 03 Get User Account by Email', async ({ request }) => {
-        const res = await request.get(
-            `${UsersApiData.endpoints.getByEmail}?email=${encodeURIComponent(UserApiPayloads.getByEmail().email)}`
-        );
+    test('TC - 03 Get User Account by Email', async ({ api }) => {
+        const { res, json } = await api.getUserByEmail();
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json).toEqual(
             expect.objectContaining({
@@ -76,14 +61,13 @@ test.describe('User API - happy path (create/delete)', () => {
         expect(json.message).toEqual(UsersApiData.messages.userUpdated);
     });
 
-    test('TC - 05 Get User Account by Email', async ({ request }) => {
-        const res = await request.get(`${UsersApiData.endpoints.getByEmail}?email=${encodeURIComponent(UserApiPayloads.getByEmail().email)}`);
+    test('TC - 05 Get User Account by Email', async ({ api }) => {
+        const { res, json } = await api.getUserByEmail();
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json).toEqual(
             expect.objectContaining({
-                responseCode: 200,
+                responseCode: UsersApiData.expected.responseCodes.ok,
                 user: expect.any(Object),
             })
         );
@@ -110,13 +94,9 @@ test.describe('User API - happy path (create/delete)', () => {
         );
     });
 
-    test('TC - 06 Delete User Account', async ({ request }) => {
-        const res = await request.delete(UsersApiData.endpoints.delete, {
-            headers: FORM_URLENCODED_HEADER,
-            data: toFormUrlEncoded(UserApiPayloads.delete()),
-        });
+    test('TC - 06 Delete User Account', async ({ api }) => {
+        const { res, json } = await api.deleteUser();
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json.message).toEqual(UsersApiData.messages.accountDeleted);
     });

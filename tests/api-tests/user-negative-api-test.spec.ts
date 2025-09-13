@@ -1,19 +1,14 @@
-import { test, expect } from "@playwright/test";
+
+import { test, expect } from "../../utils/fixtures/fixtures";
 import { UsersApiData, UserApiPayloads } from "../../utils/data-test/users-api"
 import { WRONG_EMAIL, WRONG_PASSWORD } from "../../utils/data-test/auth";
 import { parse, toFormUrlEncoded, FORM_URLENCODED_HEADER } from "../../utils/helpers/apiHelpers";
 
 test.describe('User API - negative (create/delete)', () => {
 
-    test('TC - 01 Create/Register User Account ', async ({ request }) => {
-        const form = new URLSearchParams(UserApiPayloads.create()).toString();
-        const res = await request.post(UsersApiData.endpoints.create, {
-            headers: FORM_URLENCODED_HEADER,
-            data: form,
-        });
-
+    test('TC - 01 Create/Register User Account ', async ({ api }) => {
+        const { res, json } = await api.createUser();
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.created);
         expect(json.message).toEqual(UsersApiData.messages.userCreated);
     });
@@ -91,13 +86,9 @@ test.describe('User API - negative (create/delete)', () => {
         expect(json.message).toEqual(UsersApiData.messages.methodNotSupported);
     });
 
-   test('TC - 08 Delete User Account', async ({ request }) => {
-        const res = await request.delete(UsersApiData.endpoints.delete, {
-            headers: FORM_URLENCODED_HEADER,
-            data: toFormUrlEncoded(UserApiPayloads.delete()),
-        });
+    test('TC - 08 Delete User Account', async ({ api }) => {
+        const { res, json } = await api.deleteUser();
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
-        const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json.message).toEqual(UsersApiData.messages.accountDeleted);
     });

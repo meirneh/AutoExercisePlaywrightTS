@@ -1,12 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { QUERY as PRODUCT_SEARCH_QUERY } from "../../utils/data-test/product";
 import { ProductsApiData } from "../../utils/data-test/products-api";
+import { UsersApiData } from "../../utils/data-test/users-api"
 import { parse, FORM_URLENCODED_HEADER, toFormUrlEncoded } from "../../utils/helpers/apiHelpers"
 
 test.describe('Products API', () => {
     test('TC - 01: GET returns full product list', async ({ request }) => {
         const res = await request.get(ProductsApiData.endpoints.products)
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
 
         expect(json, 'JSON parseable').toBeTruthy();
@@ -41,18 +42,18 @@ test.describe('Products API', () => {
 
     test('TC - 02: POST to product list is not supported (negative) ', async ({ request }) => {
         const res = await request.post(ProductsApiData.endpoints.products)
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(405);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.methodNotSupported);
         expect(json.message).toEqual(ProductsApiData.messages.methodNotSupported);
 
     });
 
     test('TC - 03 GET returns brands list ', async ({ request }) => {
         const res = await request.get(ProductsApiData.endpoints.brands);
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(200);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json.brands.length, 'brands length').toBe(ProductsApiData.expected.brandCount);
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
@@ -75,9 +76,9 @@ test.describe('Products API', () => {
 
     test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
         const res = await request.post(ProductsApiData.endpoints.brands);
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(405);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.methodNotSupported);
         expect(json.message).toEqual(ProductsApiData.messages.methodNotSupported);
 
     });
@@ -89,7 +90,7 @@ test.describe('Products API', () => {
             data: new URLSearchParams({ search_product: keyword }).toString(),
         });
 
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
         console.log(json.products.length, 'products length');
         expect(json.products.length, 'products length').toBe(ProductsApiData.expected.searchCount);
@@ -126,9 +127,9 @@ test.describe('Products API', () => {
             data: toFormUrlEncoded({}),
         });
 
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(400);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.exist);
         expect(json.message).toEqual(ProductsApiData.messages.missingSearchParam);
     });
 

@@ -1,46 +1,90 @@
 # AutomationExercise Playwright (TypeScript)
 
-End-to-end UI automation project built with **Playwright + TypeScript**, using a **Page Object Model (POM)** and a **global fixture** to inject reusable pages, helpers, and test data.  
-It covers flows for **Contact Us, Scroll/Subscription, Products, Authentication, Cart & Checkout**.
+End-to-end **UI & API** test suite built with **Playwright + TypeScript**, using a **Page Object Model (POM)**, a **unified global fixture** (UI + API utilities), shared **helpers**, and **data-test** files.
+
+## Features
+
+- ✅ UI tests with POM (clean, maintainable locators and actions)
+- ✅ API tests for products and users (positive + negative flows)
+- ✅ Unified fixture that injects POMs and exposes reusable API tools
+- ✅ Shared helpers for robust parsing and form-urlencoded bodies
+- ✅ Data-test files centralizing endpoints, payloads, messages, and expected codes
+- ✅ Consistent assertions and project layout
+
+---
+
+## Tech Stack
+
+- [Playwright](https://playwright.dev/) + TypeScript
+- Node.js 18+
+- VS Code (recommended)
+
+---
+
+## Project Structure
+
+```
+.
+├─ pages/                              # Page Objects (POM) for UI tests
+│  └─ ...                              # e.g., HeaderFooterPage, ProductsPage, etc.
+│
+├─ tests/
+│  ├─ api-tests/
+│  │  ├─ products-api-test.spec.ts
+│  │  ├─ user-api-test.spec.ts
+│  │  └─ user-negative-api-test.spec.ts
+│  └─ ui-tests/
+│     ├─ auth-test.spec.ts
+│     ├─ cart-checkout-test.spec.ts
+│     ├─ contact-us-test.spec.ts
+│     ├─ product-test.spec.ts
+│     └─ scroll-subscription-test.spec.ts
+│
+├─ utils/
+│  ├─ data-test/
+│  │  ├─ addresses.ts
+│  │  ├─ auth.ts
+│  │  ├─ cards.ts
+│  │  ├─ cartCheckout.ts
+│  │  ├─ contactUs.ts
+│  │  ├─ product.ts
+│  │  ├─ products-api.ts              # ProductsApiData (endpoints, expected, messages)
+│  │  ├─ scroll-subscription.ts
+│  │  ├─ users-api.ts                 # UsersApiData + payload builders + expected codes/messages
+│  │  └─ users.ts
+│  ├─ fixtures/
+│  │  └─ fixtures.ts                  # Unified fixture (UI POMs + API tools)
+│  └─ helpers/
+│     ├─ apiHelpers.ts                # parse(), FORM_URLENCODED_HEADER, toFormUrlEncoded()
+│     ├─ consent.ts
+│     ├─ navigation.ts
+│     └─ subscriptions.ts
+│
+├─ playwright.config.ts
+├─ package.json
+└─ README.md
+```
 
 ---
 
 ## Getting Started
 
 ### Prerequisites
-- **Node.js 18+**
-- **Git**
-- (Optional) **VS Code** with the “Playwright Test for VS Code” extension
+- Node.js 18+
+- Git
+- (Optional) VS Code and the “Playwright Test for VS Code” extension
 
-### Installation
+### Install
 ```bash
-git clone <YOUR-REPO-URL>
-cd <YOUR-REPO-FOLDER>
+git clone https://github.com/meirneh/AutoExercisePlaywrightTS.git
+cd AutoExercisePlaywrightTS
 npm install
 npx playwright install
 ```
 
-### Run the tests
-```bash
-# All tests (headless)
-npx playwright test
+### Base URL (optional)
+Specs can read `process.env.BASE_URL`; by default they target `https://automationexercise.com/`.
 
-# Headed (see the browser)
-npx playwright test --headed
-
-# A single spec
-npx playwright test tests/product-test.spec.ts
-
-# A single test by title
-npx playwright test -g "TC-01"
-
-# HTML report
-npx playwright show-report
-```
-
-### Optional: Base URL
-Specs use `process.env.BASE_URL` with fallback to `https://automationexercise.com/`.  
-If you want to override:
 ```bash
 # Windows CMD
 set BASE_URL=https://automationexercise.com/
@@ -50,140 +94,119 @@ $env:BASE_URL="https://automationexercise.com/"
 export BASE_URL=https://automationexercise.com/
 ```
 
-### Optional: Running from VS Code
-You can click ▶️ next to a spec or test.  
-If a “Close browser” window remains open, disable **Settings → Playwright: Use UI Mode**.
-
 ---
 
-## Project Description
+## Running Tests
 
-**Goal:** Provide a maintainable, scalable E2E test suite for a demo e-commerce site.  
-**Approach:**
-- **POM** to encapsulate selectors and actions per page.
-- **Global fixture** to create and inject POMs per test. Common setup (navigate to `/`, accept cookies) lives in `beforeEach`.
-- **Centralized test data** for data-driven scenarios.
-- **Helpers** for cross-cutting flows (navigation, cookie consent, subscriptions).
-
----
-
-## Project Structure
-
-```
-.
-├─ pages/                              # Page Objects (POM)
-│  ├─ BasePage.ts                      # Common navigation & base assertions
-│  ├─ HeaderFooterPage.ts              # Header / footer / primary navigation
-│  ├─ LoginSignUpPage.ts               # Login & sign up form
-│  ├─ SignUpPage.ts                    # Full user registration
-│  ├─ AccounCreatedPage.ts             # Account created confirmation (file name typo kept)
-│  ├─ AccountDeletedPage.ts            # Account deleted confirmation
-│  ├─ ProductsPage.ts                  # Listing/search/categories/brands
-│  ├─ ProductDetailsPage.ts            # Product details, quantity, reviews
-│  ├─ CartPage.ts                      # Cart: items, quantities, totals
-│  ├─ CheckoutPage.ts                  # Address / summary / comments
-│  ├─ PaymentPage.ts                   # Payment and confirmation
-│  └─ ContactUsPage.ts                 # Contact form
-│
-├─ utils/
-│  ├─ fixtures/
-│  │  └─ fixtures.ts                  # Global fixture (extends `test`, injects POMs)
-│  ├─ helpers/
-│  │  ├─ consent.ts                   # Accept cookie banner if present
-│  │  ├─ navigation.ts                # `goHome`, `goToCart`, small route helpers
-│  │  └─ susbscriptions.ts            # Subscription helper (name kept as in project)
-│  └─ data-test/                      # Test data (objects & constants)
-│     ├─ addresses.ts
-│     ├─ auth.ts
-│     ├─ cards.ts
-│     ├─ cartCheckout.ts
-│     ├─ contactUs.ts
-│     ├─ product.ts
-│     ├─ scroll-subscription.ts
-│     └─ users.ts
-│
-├─ tests/                              # Specs (one suite per flow)
-│  ├─ auth-test.spec.ts                # Registration, login, logout, error validations
-│  ├─ cart-checkout-test.spec.ts       # Cart & Checkout (register/login before or during)
-│  ├─ contact-us-test.spec.ts          # Contact Us form
-│  ├─ product-test.spec.ts             # Search, categories, brands, recommended, reviews
-│  └─ scroll-subscription-test.spec.ts # Scroll up/down & subscription (home/cart)
-│
-├─ playwright.config.ts                # Base config (reporters, retries, etc.)
-└─ README.md
-```
-
----
-
-## How It Works (Fixture, POMs, Helpers, Data)
-
-### Global Fixture (`utils/fixtures/fixtures.ts`)
-Extends `@playwright/test` and exposes POMs as test fixtures. In specs, you import `test/expect` from the fixture and use a shared `beforeEach`:
-
-```ts
-import { test, expect } from "../utils/fixtures/fixtures";
-
-test.beforeEach(async ({ page, headerFooterPage, productsPage }) => {
-  await page.goto("/", { waitUntil: "domcontentloaded" });
-  // Accept cookies, common setup, etc.
-});
-
-test("example", async ({ headerFooterPage, productsPage }) => {
-  await headerFooterPage.goToProductsPage();
-  await productsPage.searchProduct("dress");
-});
-```
-
-### Page Objects
-Each class models a page and encapsulates **private selectors**, **actions** (clicks/fills), and **assertions** (`expect(...)`).  
-This decouples tests from DOM details and improves reuse.
-
-### Helpers
-Small, high-level functions used across specs (navigate home/cart, submit subscription, accept cookies). Reduce duplication and keep specs focused on behavior.
-
-### Test Data
-Typed objects for inputs & expectations (users, addresses, cards, products, validation texts).  
-Enables data-driven testing and keeps specs clean.
-
----
-
-## Install & Run (CLI quick reference)
-
+### All tests (UI + API)
 ```bash
-# Install deps & browsers
-npm install
-npx playwright install
-
-# Run all tests
 npx playwright test
+```
 
-# Headed mode
-npx playwright test --headed
+### Only UI tests
+```bash
+npx playwright test tests/ui-tests
+# headed
+npx playwright test tests/ui-tests --headed
+```
 
-# Filter by spec
-npx playwright test tests/auth-test.spec.ts
+### Only API tests
+```bash
+npx playwright test tests/api-tests
+# single API spec
+npx playwright test tests/api-tests/user-api-test.spec.ts
+```
 
-# Filter by title
-npx playwright test -g "TC-02"
-
-# Report
+### Filter by title / show report
+```bash
+npx playwright test -g "TC - 01"
 npx playwright show-report
 ```
 
 ---
 
-## Notes & Conventions
+## Unified Fixture
 
-- **Naming:** specs end with `*-test.spec.ts`; test titles prefixed with `TC-XX` for traceability.
-- **Automatic teardown:** no manual `chromium.launch()` / `page.close()`; Playwright manages `browser/context/page` per test.
-- **VS Code UI Mode:** if a window asks to “Close browser”, that’s the UI runner. Disable **Use UI Mode** to auto-close.
+`utils/fixtures/fixtures.ts` extends Playwright’s `test` to provide:
+
+- **UI POMs** (e.g., `headerFooterPage`, `productsPage`, …)
+- **API tools** (`api.createUser()`, `api.loginUser()`, `api.getUserByEmail()`, `api.deleteUser()`)
+
+Import `test/expect` from the fixture in all specs (UI and API) for consistency:
+
+```ts
+import { test, expect } from "../../utils/fixtures/fixtures";
+```
+
+**UI example**
+```ts
+test("Search product from header", async ({ headerFooterPage, productsPage }) => {
+  await headerFooterPage.goToProductsPage();
+  await productsPage.searchProduct("dress");
+  await expect(productsPage.results).toBeVisible();
+});
+```
+
+**API example (using fixture `api`)**
+```ts
+import { UsersApiData } from "../../utils/data-test/users-api";
+import { test, expect } from "../../utils/fixtures/fixtures";
+
+test("Create user and verify login", async ({ api }) => {
+  const { res, json } = await api.createUser();
+  expect(res.status()).toBe(UsersApiData.expected.httpOk);
+  expect(json.responseCode).toBe(UsersApiData.expected.responseCodes.created);
+
+  const login = await api.loginUser();
+  expect(login.json.message).toBe(UsersApiData.messages.userExists);
+});
+```
 
 ---
 
-## Future Improvements (optional)
+## API Helpers
 
-- **Authenticated runs with `storageState`:** avoid repeating login in non-auth suites.
-- **Trace/video only on failure:** `trace: 'on-first-retry'`, `video: 'retain-on-failure'`, `screenshot: 'only-on-failure'`.
-- **Semantic selectors everywhere:** prefer `getByRole` / `getByLabel` / `getByTestId`.
-- **Tags & grep:** run subsets fast in CI/local.
-- **Parallelism & retries per environment:** tune for speed vs. stability.
+`utils/helpers/apiHelpers.ts` centralizes common API utilities:
+
+- `parse(res)` — safely parses responses (even when the server wraps JSON in HTML)
+- `FORM_URLENCODED_HEADER` — standard header for `x-www-form-urlencoded`
+- `toFormUrlEncoded(obj)` — builds `x-www-form-urlencoded` bodies
+
+```ts
+import { parse, FORM_URLENCODED_HEADER, toFormUrlEncoded } from "../../utils/helpers/apiHelpers";
+import { ProductsApiData } from "../../utils/data-test/products-api";
+
+const res = await request.post(ProductsApiData.endpoints.search, {
+  headers: FORM_URLENCODED_HEADER,
+  data: toFormUrlEncoded({ search_product: "dress" }),
+});
+const json = await parse(res);
+expect(json.products.length).toBeGreaterThan(0);
+```
+
+---
+
+## Data-Test Files
+
+- Centralize **endpoints**, **payload builders**, **expected status codes**, and **messages** for cleaner specs without “magic strings/numbers”.
+
+Examples:
+- `utils/data-test/users-api.ts` → endpoints for user CRUD + payload builders + expected codes/messages  
+- `utils/data-test/products-api.ts` → endpoints/messages/expected for products
+
+---
+
+## Conventions
+
+- Test titles prefixed with `TC - XX` for traceability.
+- Prefer Playwright’s recommended locators in UI: `getByRole`, `getByLabel`, `getByTestId`.
+- DRY first: reuse helpers/fixtures and data-test files instead of in-spec duplication.
+- Keep assertions readable (e.g., named expectations and `objectContaining` for shape checks).
+
+---
+
+## Roadmap (optional)
+
+- Add `ensureCleanup()` in the fixture to auto-delete accounts if a test fails before teardown.
+- Strong typing for API responses (`type User`, `type Product`) or JSON schema validation.
+- CI workflow (GitHub Actions) with artifacts (HTML report, traces, videos on failure).

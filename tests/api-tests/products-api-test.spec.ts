@@ -75,7 +75,7 @@ test.describe('Products API', () => {
     });
 
     test('TC - 04 PUT to brands list is not supported (negative)', async ({ request }) => {
-        const res = await request.post(ProductsApiData.endpoints.brands);
+        const res = await request.put(ProductsApiData.endpoints.brands);
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
         expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.methodNotSupported);
@@ -92,7 +92,6 @@ test.describe('Products API', () => {
 
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        console.log(json.products.length, 'products length');
         expect(json.products.length, 'products length').toBe(ProductsApiData.expected.searchCount);
         for (const p of json.products) {
             expect(p).toEqual(

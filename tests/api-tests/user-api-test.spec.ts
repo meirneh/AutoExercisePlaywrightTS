@@ -1,48 +1,31 @@
 import { test, expect } from "@playwright/test";
-import { UsersApiData, UserApiPayloads, DefaultUpdate } from "../../utils/data-test/users-api"
-
-function safeParse(text: string): any | null {
-    try {
-        return JSON.parse(text);
-    } catch {
-        const match = text.match(/{[\s\S]*}/); // tries to extract JSON into HTML
-        if (match) {
-            try { return JSON.parse(match[0]); } catch { return null; }
-        }
-        return null;
-    }
-
-}
-
-async function parse(res: Response | any) {
-    const bodyText = await (res.text?.() ?? res.body?.text?.() ?? Promise.resolve(""));
-    return safeParse(bodyText);
-}
+import { UsersApiData, UserApiPayloads, DefaultUpdate } from "../../utils/data-test/users-api";
+import { parse, toFormUrlEncoded, FORM_URLENCODED_HEADER } from "../../utils/helpers/apiHelpers"
 
 test.describe('User API - happy path (create/delete)', () => {
 
     test('TC - 01 Create/Register User Account ', async ({ request }) => {
         const form = new URLSearchParams(UserApiPayloads.create()).toString();
         const res = await request.post(UsersApiData.endpoints.create, {
-            headers: UsersApiData.headers.formUrlEncoded,
+            headers: FORM_URLENCODED_HEADER,
             data: form,
         });
 
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(201);
-        expect(json.message).toEqual("User created!");
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.created);
+        expect(json.message).toEqual(UsersApiData.messages.userCreated);
     });
 
     test('TC - 02 Verify Login ', async ({ request }) => {
         const res = await request.post(UsersApiData.endpoints.login, {
-            headers: UsersApiData.headers.formUrlEncoded,
-            data: new URLSearchParams(UserApiPayloads.login()).toString(),
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.login())
         })
 
-        expect(res.status(), 'status code').toBe(200);
+        expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(UsersApiData.expected.httpOk);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json.message).toEqual(UsersApiData.messages.userExists);
     });
 
@@ -52,7 +35,7 @@ test.describe('User API - happy path (create/delete)', () => {
         );
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
-        expect(json.responseCode).toEqual(UsersApiData.expected.httpOk);
+        expect(json.responseCode).toEqual(UsersApiData.expected.responseCodes.ok);
         expect(json).toEqual(
             expect.objectContaining({
                 responseCode: 200,
@@ -84,8 +67,8 @@ test.describe('User API - happy path (create/delete)', () => {
 
     test('TC - 04 Update User Account', async ({ request }) => {
         const res = await request.put(UsersApiData.endpoints.update, {
-            headers: UsersApiData.headers.formUrlEncoded,
-            data: new URLSearchParams(UserApiPayloads.update(undefined, DefaultUpdate)).toString(),
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.update(undefined, DefaultUpdate)),
         });
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);
@@ -129,8 +112,8 @@ test.describe('User API - happy path (create/delete)', () => {
 
     test('TC - 06 Delete User Account', async ({ request }) => {
         const res = await request.delete(UsersApiData.endpoints.delete, {
-            headers: UsersApiData.headers.formUrlEncoded,
-            data: new URLSearchParams(UserApiPayloads.delete()).toString(),
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded(UserApiPayloads.delete()),
         });
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);
         const json: any = await parse(res);

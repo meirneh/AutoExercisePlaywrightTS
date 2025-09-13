@@ -13,11 +13,11 @@ test.describe('Products API', () => {
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
-                responseCode: 200,
+                responseCode: UsersApiData.expected.responseCodes.ok,
                 products: expect.any(Array),
             })
         )
-        expect(json.products.length, 'products length').toBe(ProductsApiData.expected.brandCount);
+        expect(json.products.length, 'products length').toBe(ProductsApiData.expected.productCount);
 
         for (const p of json.products) {
             expect(p).toEqual(
@@ -58,7 +58,7 @@ test.describe('Products API', () => {
         expect(json, 'JSON parseable').toBeTruthy();
         expect(json).toEqual(
             expect.objectContaining({
-                responseCode: 200,
+                responseCode: UsersApiData.expected.responseCodes.ok,
                 brands: expect.any(Array),
             })
         );
@@ -86,8 +86,8 @@ test.describe('Products API', () => {
     test('TC - 05 Search product by keyword returns filtered results', async ({ request }) => {
         const keyword = PRODUCT_SEARCH_QUERY
         const res = await request.post(ProductsApiData.endpoints.search, {
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            data: new URLSearchParams({ search_product: keyword }).toString(),
+            headers: FORM_URLENCODED_HEADER,
+            data: toFormUrlEncoded({ search_product: keyword })
         });
 
         expect(res.status(), 'status code').toBe(UsersApiData.expected.httpOk);

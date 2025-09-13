@@ -1,4 +1,5 @@
-import { test, expect } from "@playwright/test";
+
+import {test, expect} from "../../utils/fixtures/fixtures";
 import { QUERY as PRODUCT_SEARCH_QUERY } from "../../utils/data-test/product";
 import { ProductsApiData } from "../../utils/data-test/products-api";
 import { UsersApiData } from "../../utils/data-test/users-api"
@@ -32,10 +33,7 @@ test.describe('Products API', () => {
                         }),
                         category: expect.stringMatching(/\S/),
                     })
-
-
                 }),
-
             )
         }
     });

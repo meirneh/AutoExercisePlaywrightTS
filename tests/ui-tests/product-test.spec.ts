@@ -1,12 +1,12 @@
 
-import { test, expect } from "../utils/fixtures/fixtures";
+import { test, expect } from "../../utils/fixtures/fixtures";
 import type { Page } from "@playwright/test";
 
-import HeaderFooterPage from "../pages/HeaderFooterPage";
-import ProductsPage from "../pages/ProductsPage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
-import CartPage from "../pages/CartPage";
-import { PATH_VIEW_CART } from "../utils/data-test/cartCheckout";
+import HeaderFooterPage from "../../pages/HeaderFooterPage";
+import ProductsPage from "../../pages/ProductsPage";
+import ProductDetailsPage from "../../pages/ProductDetailsPage";
+import CartPage from "../../pages/CartPage";
+import { PATH_VIEW_CART } from "../../utils/data-test/cartCheckout";
 type Section = Parameters<ProductsPage['selectSection']>[0];
 type SubSection = Parameters<ProductsPage['selectSection']>[1];
 
@@ -15,8 +15,8 @@ type SubSection = Parameters<ProductsPage['selectSection']>[1];
 import {
   QUERY, productList, resultList, productsTopsList, productsTShirtsList,
   brandHMList, productDetails, recommendedItemList, item
-} from "../utils/data-test/product";
-import { acceptCookiesIfPresent } from "../utils/helpers/consent";
+} from "../../utils/data-test/product";
+import { acceptCookiesIfPresent } from "../../utils/helpers/consent";
 
 let pageRef: Page; // page from fixture
 

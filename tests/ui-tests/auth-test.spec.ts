@@ -1,15 +1,15 @@
 
-import { test} from "../utils/fixtures/fixtures";
+import { test} from "../../utils/fixtures/fixtures";
 import type { Page } from "@playwright/test";
 
-import HeaderFooterPage from "../pages/HeaderFooterPage";
-import LoginSignUpPage from "../pages/LoginSignUpPage";
-import SignUpPage, { UserData } from "../pages/SignUpPage";
-import AccountCreatedPage from "../pages/AccounCreatedPage";
-import AccountDeletedPage from "../pages/AccountDeletedPage";
-import { WRONG_EMAIL, WRONG_PASSWORD, EMPTY_PASSWORD, EXISTING_USER_NAME, userData } from "../utils/data-test/auth";
-import { goHome } from "../utils/helpers/navigation";
-import { acceptCookiesIfPresent } from "../utils/helpers/consent";
+import HeaderFooterPage from "../../pages/HeaderFooterPage";
+import LoginSignUpPage from "../../pages/LoginSignUpPage";
+import SignUpPage, { UserData } from "../../pages/SignUpPage";
+import AccountCreatedPage from "../../pages/AccounCreatedPage";
+import AccountDeletedPage from "../../pages/AccountDeletedPage";
+import { WRONG_EMAIL, WRONG_PASSWORD, EMPTY_PASSWORD, EXISTING_USER_NAME, userData } from "../../utils/data-test/auth";
+import { goHome } from "../../utils/helpers/navigation";
+import { acceptCookiesIfPresent } from "../../utils/helpers/consent";
 
 let pageRef: Page;
 

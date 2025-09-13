@@ -1,25 +1,25 @@
 
-import { test, expect } from "../utils/fixtures/fixtures";
+import { test, expect } from "../../utils/fixtures/fixtures";
 import type { Page } from "@playwright/test"
-import HeaderFooterPage from "../pages/HeaderFooterPage";
-import ProductsPage from "../pages/ProductsPage";
-import ProductDetailsPage from "../pages/ProductDetailsPage";
-import CartPage from "../pages/CartPage";
-import LoginSignUpPage from "../pages/LoginSignUpPage";
-import SignUpPage, { UserData } from "../pages/SignUpPage";
-import AccountCreatedPage from "../pages/AccounCreatedPage";
-import CheckoutPage, { DeliveryAddress } from "../pages/CheckoutPage";
-import AccountDeletedPage from "../pages/AccountDeletedPage";
-import PaymentPage, { PaymentDetailsSplit } from "../pages/PaymentPage";
-import { productList, resultList } from "../utils/data-test/product";
+import HeaderFooterPage from "../../pages/HeaderFooterPage";
+import ProductsPage from "../../pages/ProductsPage";
+import ProductDetailsPage from "../../pages/ProductDetailsPage";
+import CartPage from "../../pages/CartPage";
+import LoginSignUpPage from "../../pages/LoginSignUpPage";
+import SignUpPage, { UserData } from "../../pages/SignUpPage";
+import AccountCreatedPage from "../../pages/AccounCreatedPage";
+import CheckoutPage, { DeliveryAddress } from "../../pages/CheckoutPage";
+import AccountDeletedPage from "../../pages/AccountDeletedPage";
+import PaymentPage, { PaymentDetailsSplit } from "../../pages/PaymentPage";
+import { productList, resultList } from "../../utils/data-test/product";
 import {
   ORDER_COMMENT, PATH_VIEW_CART,
   SELECTED_TWO_PRODUCTS, userData, userInfoAddress,
   card, EXPECT_CART_TWO_ITEMS, EXPECT_CART_TOTAL_TWO_ITEMS,
   QTY_STYLISH_DRESS, EXPECT_STYLISH_DRESS_CART, EXPECT_SEARCH_CART, SEARCH_QUERY_TSHIRT
-} from "../utils/data-test/cartCheckout";
-import { goHome, goToCart } from "../utils/helpers/navigation";
-import { acceptCookiesIfPresent } from "../utils/helpers/consent";
+} from "../../utils/data-test/cartCheckout";
+import { goHome, goToCart } from "../../utils/helpers/navigation";
+import { acceptCookiesIfPresent } from "../../utils/helpers/consent";
 
 let pageRef: Page;
 

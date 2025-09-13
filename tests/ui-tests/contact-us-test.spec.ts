@@ -1,10 +1,10 @@
-import { test } from "../utils/fixtures/fixtures"
+import { test } from "../../utils/fixtures/fixtures"
 import type { Page } from "@playwright/test";
-import HeaderFooterPage from "../pages/HeaderFooterPage";
-import ContactUsPage from "../pages/ContactUsPage";
-import { contactUsFormInput } from "../utils/data-test/contactUs";
-import { acceptCookiesIfPresent } from "../utils/helpers/consent";
-import { goHome } from "../utils/helpers/navigation";
+import HeaderFooterPage from "../../pages/HeaderFooterPage";
+import ContactUsPage from "../../pages/ContactUsPage";
+import { contactUsFormInput } from "../../utils/data-test/contactUs";
+import { acceptCookiesIfPresent } from "../../utils/helpers/consent";
+import { goHome } from "../../utils/helpers/navigation";
 
 test.use({
     baseURL: process.env.BASE_URL ?? "https://automationexercise.com/",
